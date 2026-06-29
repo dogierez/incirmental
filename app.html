@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Incirmental App</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0A1128">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
+    
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            padding: 20px;
+            background-color: #0A1128; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Top Center Logo */
+        .top-app-logo {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            z-index: 15;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .bg-clipart {
+            position: absolute;
+            stroke: rgba(255, 255, 255, 0.18); 
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .icon-cap { top: 8%; left: 8%; width: 180px; height: 180px; transform: rotate(-10deg); }
+        .icon-globe { top: 60%; left: 6%; width: 200px; height: 200px; transform: rotate(15deg); }
+        .icon-book { top: 12%; right: 10%; width: 160px; height: 160px; transform: rotate(15deg); }
+        .icon-atom { bottom: 10%; right: 8%; width: 220px; height: 220px; transform: rotate(-20deg); }
+        .icon-pencil { bottom: -20px; left: 45%; width: 150px; height: 150px; transform: rotate(-45deg); }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #ffffff;
+            background: #ff8c00;
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border: 2px solid #ff8c00;
+            text-decoration: none;
+            z-index: 10;
+            transition: background-color 0.2s;
+        }
+
+        .back-button:hover { background-color: #e67e00; }
+
+        .global-counter {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border: 2px solid #ff8c00;
+            z-index: 10;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 950px;
+            background: transparent;
+            padding: 40px 20px;
+            position: relative;
+            text-align: center;
+            z-index: 10; 
+        }
+        
+        .step-counter {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #555555;
+            background: #d9d9d9;
+            padding: 5px 10px;
+            border-radius: 6px;
+        }
+
+        .instructions {
+            font-size: 15px;
+            color: #e0e0e0;
+            margin-bottom: 30px;
+            line-height: 2;
+            font-weight: 500;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .sentence-display {
+            background-color: #e6e6e6; 
+            border: 6px solid #ff8c00; 
+            border-radius: 16px;
+            margin: 20px 0;
+            padding: 50px 30px;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .turkish-text, .english-text {
+            font-size: clamp(24px, 5.5vw, 42px); 
+            width: 100%;
+            line-height: 1.4;
+            font-weight: 700;
+            position: relative;
+        }
+
+        .turkish-text { color: #000000; }
+        .english-text {
+            color: #222222;
+            opacity: 0; 
+            transition: opacity 0.2s ease-in-out;
+        }
+        .english-text.revealed { opacity: 1; }
+
+        /* The Neon Blue Thicker Separator Line */
+        .separator {
+            width: 80%;
+            height: 8px; /* Increased Thickness */
+            background-color: #00e5ff; /* Neon Light Blue */
+            margin: 25px 0;
+            border-radius: 4px;
+            opacity: 0; 
+            transition: opacity 0.2s ease-in-out;
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.4); /* Subtle Neon Glow */
+        }
+        .separator.revealed { opacity: 1; }
+
+        .base-text { color: #000000; } 
+        .step2-text { color: #d93025; font-weight: bold; } 
+        .step3-text { color: #188038; font-weight: bold; } 
+        
+        .dict-word {
+            text-decoration: underline;
+            text-decoration-color: rgba(204, 255, 0, 0.4); 
+            text-decoration-thickness: 3px;
+            text-underline-offset: 4px;
+            cursor: pointer;
+            position: relative;
+            transition: text-decoration-color 0.2s;
+        }
+        
+        .dict-word:hover, .dict-word.active {
+            text-decoration-color: rgba(204, 255, 0, 1); 
+        }
+
+        .dict-tooltip {
+            position: absolute;
+            bottom: 110%; 
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #222222;
+            color: #ccff00; 
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 20px;
+            font-weight: bold;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, bottom 0.2s;
+            z-index: 100;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+            border: 1px solid #444;
+        }
+        
+        .dict-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -6px;
+            border-width: 6px;
+            border-style: solid;
+            border-color: #222222 transparent transparent transparent;
+        }
+
+        .dict-word.active .dict-tooltip {
+            opacity: 1;
+            visibility: visible;
+            bottom: 130%; 
+        }
+
+        kbd {
+            background-color: #eee;
+            border-radius: 4px;
+            border: 1px solid #b4b4b4;
+            box-shadow: 0 1px 1px rgba(0,0,0,.2), 0 2px 0 0 rgba(255,255,255,.7) inset;
+            color: #333;
+            display: inline-block;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 3px 6px;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+
+<img src="icon-192x192.png" alt="App Logo" class="top-app-logo">
+
+<svg class="bg-clipart icon-cap" viewBox="0 0 100 100">
+    <path d="M10 40 L50 20 L90 40 L50 60 Z"></path>
+    <path d="M25 50 L25 75 C25 85 50 90 50 90 C50 90 75 85 75 75 L75 50"></path>
+    <path d="M90 40 L90 70"></path>
+</svg>
+<svg class="bg-clipart icon-globe" viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="40"></circle>
+    <path d="M50 10 C30 30 30 70 50 90 C70 70 70 30 50 10"></path>
+    <line x1="10" y1="50" x2="90" y2="50"></line>
+</svg>
+<svg class="bg-clipart icon-book" viewBox="0 0 100 100">
+    <path d="M50 80 L50 20 C50 20 30 10 10 20 L10 80 C30 70 50 80 50 80 Z"></path>
+    <path d="M50 80 L50 20 C50 20 70 10 90 20 L90 80 C70 70 50 80 50 80 Z"></path>
+</svg>
+<svg class="bg-clipart icon-atom" viewBox="0 0 100 100">
+    <ellipse cx="50" cy="50" rx="40" ry="15" transform="rotate(30 50 50)"></ellipse>
+    <ellipse cx="50" cy="50" rx="40" ry="15" transform="rotate(-30 50 50)"></ellipse>
+    <ellipse cx="50" cy="50" rx="40" ry="15" transform="rotate(90 50 50)"></ellipse>
+    <circle cx="50" cy="50" r="6" fill="rgba(255,255,255,0.18)"></circle>
+</svg>
+<svg class="bg-clipart icon-pencil" viewBox="0 0 100 100">
+    <polygon points="30,80 20,80 20,70 70,20 80,30"></polygon>
+    <polygon points="20,80 15,90 30,80"></polygon>
+    <line x1="25" y1="65" x2="35" y2="75"></line>
+</svg>
+
+<a href="index.html" class="back-button">← Back</a>
+
+<div class="global-counter" id="global-counter">Card 1 / 24</div>
+
+<div class="app-container">
+    <div class="instructions">
+        <kbd>↑</kbd> Reveal English &nbsp;|&nbsp; <kbd>→</kbd> Expand &nbsp;|&nbsp; <kbd>←</kbd> Undo &nbsp;|&nbsp; <kbd>↓</kbd> Next Card<br>
+        <small style="color: #ff8c00; margin-top: 10px; display: inline-block;">Tap faintly underlined words for translation</small>
+    </div>
+    
+    <div class="sentence-display">
+        <div class="step-counter" id="step-counter">Step 1 / 3</div>
+
+        <div class="turkish-text" id="turkish-output"></div>
+        <div class="separator" id="language-separator"></div>
+        <div class="english-text" id="english-output"></div>
+    </div>
+</div>
+
+<script>
+    const customDictionary = {
+        "nurse": "hemşire", "Nurse": "hemşire", "blood": "kan", "took": "almak", "quick": "hızlı", "way": "şekil", "after": "sonra", "sat": "oturmak", "armchair": "koltuk",
+        "pilot": "pilot", "Pilot": "pilot", "entered": "girmek", "cockpit": "kokpit", "in order to": "için", "check": "kontrol etmek", "gauges": "gösterge", "changed": "değiştirmek",
+        "police": "polis", "Police": "polis", "stopped": "durdurmak", "cars": "araba", "due to": "-den dolayı", "terror": "terör", "attack": "saldırı", "assigned": "görevli",
+        "vet": "veteriner", "Vet": "veteriner", "had to": "zorunda olmak", "operate": "ameliyat etmek", "dog": "köpek", "before": "önce", "died": "ölmek", "called": "çağırmak",
+        "doctor": "doktor", "Doctor": "doktor", "could examine": "muayene edebilmek", "examine": "incelemek / muayene etmek", "patient": "hasta", "came": "gelmek", "hospital": "hastane", "by looking at": "bakarak", "looking": "bakmak", "x-ray": "röntgen",
+        "Customs officer": "gümrük memuru", "customs officer": "gümrük memuru", "officer": "memur", "opened": "açmak", "luggage": "valiz", "proper": "uygun", "while": "iken", "taking out": "çıkarmak", "passport": "pasaport",
+        "passenger": "yolcu", "Passenger": "yolcu", "didn't have to": "zorunda olmamak", "shout": "bağırmak", "plane": "uçak", "disturbing": "rahatsız etmek", "everybody": "herkes", "since": "için / -den beri", "seat": "koltuk",
+        "salesman": "satıcı", "Salesman": "satıcı", "showing": "göstermek", "items": "ürün", "item": "ürün", "so that": "böylece / -sın diye", "customer": "müşteri", "choose": "seçmek", "shop": "dükkan",
+        "complained": "şikayet etmek", "about": "hakkında", "writing": "yazmak", "factory": "fabrika", "because": "çünkü / için", "accept": "kabul etmek",
+        "barman": "barmen", "Barman": "barmen", "preparing": "hazırlamak", "cocktail": "kokteyl", "until": "-e kadar", "bar": "bar", "ordered": "sipariş etmek", "by": "tarafından", "room service": "oda servisi",
+        "captain": "kaptan", "Captain": "kaptan", "should have": "-meliydi", "checked": "kontrol etmek", "radar": "radar", "escape": "kaçmak", "waves": "dalga", "bad": "kötü", "weather": "hava",
+        "mechanic": "tamirci", "Mechanic": "tamirci", "used to": "eskiden yapmak", "repair": "tamir etmek", "modems": "modem", "despite": "-e rağmen", "technical": "teknik", "problems": "sorun", "hired": "işe almak", "last": "geçen", "year": "yıl",
+        "Pirates": "korsan", "pirates": "korsan", "stopping": "durdurmak", "ships": "gemi", "get": "almak", "Ransom": "fidye", "ransom": "fidye", "passed": "geçmek", "near": "yakın", "coast": "sahil",
+        "gardener": "bahçıvan", "Gardener": "bahçıvan", "cut": "kesmek", "grass": "çim", "cleans": "temizlemek", "clean": "temizlemek", "garden": "bahçe", "land lady": "ev sahibesi", "reminded": "hatırlatmak", "remind": "hatırlatmak",
+        "lawyer": "avukat", "file": "dosya", "client": "müvekkil", "arrived": "gelmek", "arrive": "gelmek", "office": "ofis", "learned": "öğrenmek", "learn": "öğrenmek", "why": "neden",
+        "manager": "müdür", "warned": "uyarmak", "warn": "uyarmak", "employee": "çalışan", "gossiping": "dedikodu yapmak", "gossip": "dedikodu yapmak", "CEO": "CEO", "wondering": "merak etmek", "wonder": "merak etmek", "if": "olup olmadığını",
+        "coach": "koç", "explaining": "anlatmak", "explain": "anlatmak", "plan": "plan", "using": "kullanmak", "use": "kullanmak", "iPad": "iPad", "players": "oyuncu", "bench": "yedek kulübesi",
+        "tourist": "turist", "Tourist": "turist", "rent": "kiralamak", "car": "araba", "visit": "ziyaret etmek", "important": "önemli", "cities": "şehir", "enjoying": "tadını çıkarmak", "trip": "seyahat", "Europe": "Avrupa",
+        "security": "güvenlik", "checking": "kontrol etmek", "bags": "çanta", "nobody": "kimse", "can": "yapabilmek", "enter": "girmek", "gun": "silah", "criminals": "suçlu", "know": "bilmek",
+        "footballer": "futbolcu", "Footballer": "futbolcu", "scored": "gol atmak", "goals": "gol", "three": "üç", "first half": "ilk yarı", "finished": "bitmek", "transferred": "transfer etmek", "Argentina": "Arjantin",
+        "singer": "şarkıcı", "Singer": "şarkıcı", "win": "kazanmak", "Eurovision": "Eurovision", "composing": "bestelemek", "rock music": "rock müzik", "Nobody": "kimse", "believed": "inanmak",
+        "politicians": "politikacı", "Politicians": "politikacı", "stealing": "çalmak", "money": "para", "state": "devlet", "tell": "söylemek", "truth": "doğru", "all": "hepimiz", "pouring": "doldurmak", "whiskey": "viski", "forget": "unutmak", "drunk": "sarhoş", "butcher": "kasap", "Butcher": "kasap", "chop": "doğramak", "chicken": "tavuk", "rude": "kaba", "serving": "hizmet etmek", "customers": "müşteri",
+
+        "Hemşire": "nurse", "hemşire": "nurse", "kan": "blood", "aldı": "take", "hızlı": "quick", "şekilde": "way", "koltuğa": "armchair", "oturduktan": "sit", "sonra": "after",
+        "Pilot": "pilot", "pilot": "pilot", "kokpite": "cockpit", "girdi": "enter", "göstergeleri": "gauge", "kontrol etmek": "check", "için": "in order to / for", "değiştirilen": "change",
+        "Polis": "police", "polis": "police", "arabaları": "car", "durdurdu": "stop", "terör": "terror", "saldırısından": "attack", "dolayı": "due to", "Görevli": "assigned",
+        "Veteriner": "vet", "veteriner": "vet", "köpeği": "dog", "köpek": "dog", "ameliyat etmek": "operate", "zorundaydı": "have to", "ölmeden": "die", "önce": "before", "Çağrılan": "call",
+        "Doktor": "doctor", "doktor": "doctor", "hastayı": "patient", "hasta": "patient", "muayene edebildi": "examine", "hastaneye": "hospital", "geldiğinde": "come", "röntgene": "x-ray", "bakarak": "look",
+        "Gümrük memuru": "customs officer", "Gümrük": "customs", "memuru": "officer", "valizimi": "luggage", "açmıştı": "open", "uygun": "proper", "pasaportumu": "passport", "çıkarırken": "take out",
+        "Yolcu": "passenger", "yolcu": "passenger", "uçakta": "plane", "bağırmak": "shout", "koltuğuna": "seat", "oturduğu": "sit", "herkesi": "everybody", "rahatsız ederek": "disturb", "rahatsız": "disturb",
+        "Satıcı": "salesman", "satıcı": "salesman", "ürünleri": "item", "gösteriyordu": "show", "müşterinin": "customer", "müşteri": "customer", "seçebilmesi": "choose", "dükkana": "shop", "girdiğinden": "enter", "beri": "since",
+        "Müşteri": "customer", "ürün": "item", "hakkında": "about", "şikayet etti": "complain", "fabrikaya": "factory", "yazarak": "write", "dükkan": "shop", "kabul etmediği": "accept",
+        "Barmen": "barman", "barmen": "barman", "kokteyl": "cocktail", "kokteyli": "cocktail", "hazırlıyordu": "prepare", "bara": "bar", "oturana": "sit", "kadar": "until", "oda servisi": "room service", "tarafından": "by", "sipariş edilen": "order",
+        "Kaptan": "captain", "kaptan": "captain", "radarı": "radar", "kontrol etmeliydi": "check", "dalgalardan": "wave", "kaçmak": "escape", "kötü": "bad", "havadan": "weather",
+        "Tamirci": "mechanic", "tamirci": "mechanic", "modemleri": "modem", "tamir ederdi": "repair", "teknik": "technical", "sorunlara": "problem", "rağmen": "despite", "Geçen": "last", "yıl": "year", "işe alınan": "hire",
+        "Korsanlar": "pirate", "korsanlar": "pirate", "gemileri": "ship", "gemiler": "ship", "durduruyordu": "stop", "fidye": "ransom", "almak": "get", "sahilin": "coast", "yakınından": "near", "geçtiğinde": "pass",
+        "Bahçıvan": "gardener", "bahçıvan": "gardener", "bahçıvanın": "gardener", "çimleri": "grass", "kesmek": "cut", "bahçeyi": "garden", "temizledikten": "clean", "Ev sahibesi": "land lady", "hatırlattı": "remind", "kalacağını": "have to",
+        "Avukat": "lawyer", "Avukatın": "lawyer", "dosyayı": "file", "inceleyemedi": "examine", "inceleyemediğini": "examine", "müvekkili": "client", "ofise": "office", "gelene": "arrive", "öğrendik": "learn", "neden": "why",
+        "Müdür": "manager", "müdürün": "manager", "çalışanı": "employee", "uyardı": "warn", "uyarıp": "warn", "uyarmadığını": "warn", "ofiste": "office", "dedikodu": "gossip", "dedikodu yapan": "gossip", "yapan": "do/make", "CEO": "CEO", "merak ediyordu": "wonder",
+        "Koç": "coach", "koç": "coach", "planı": "plan", "anlatıyordu": "explain", "kullanarak": "use", "oyuncular": "player", "yedek kulübesinde": "bench", "kulübesinde": "bench", "otururken": "sit",
+        "Turist": "tourist", "turist": "tourist", "araba": "car", "kiralamalı": "rent", "önemli": "important", "şehirleri": "city", "ziyaret edebilmesi": "visit", "Avrupa'daki": "Europe", "seyahatinin": "trip", "tadını çıkaran": "enjoy",
+        "Güvenlik": "security", "güvenliğin": "security", "çantaları": "bag", "kontrol ediyor": "check", "kontrol ettiğini": "check", "kimse": "nobody", "silahla": "gun", "giremesin": "enter", "Suçlular": "criminal", "bilmek zorundaydı": "know",
+        "Futbolcu": "footballer", "futbolcu": "footballer", "üç": "three", "gol": "goal", "attı": "score", "ilk yarı": "first half", "bitene": "finish", "Arjantin'den": "Argentina", "transfer edilen": "transfer",
+        "Şarkıcı": "singer", "şarkıcı": "singer", "şarkıcının": "singer", "kazanacak": "win", "kazanacağına": "win", "Eurovision'u": "Eurovision", "Rock müzik": "rock music", "rock müzik": "rock music", "besteleyen": "compose", "Kimse": "nobody", "kimse": "nobody", "inanmadı": "believe",
+        "Politikacılar": "politician", "politikacılar": "politician", "doğruyu": "truth", "söylemek": "tell", "devletten": "state", "para": "money", "çalan": "steal", "Hepimiz": "all of us", "biliyoruz": "know",
+        "viski": "whiskey", "dolduruyordu": "pour", "unutabilmesi": "forget", "sarhoş": "drunk", "olana": "become",
+        "Kasap": "butcher", "kasap": "butcher", "tavuğu": "chicken", "doğramadı": "chop", "kaba": "rude", "Diğer": "other", "diğer": "other", "hizmet eden": "serve", "müşterilere": "customer"
+    };
+
+    function injectDictionary(htmlString) {
+        let keys = Object.keys(customDictionary).sort((a, b) => b.length - a.length);
+        let tokens = htmlString.split(/(<[^>]+>)/g); 
+        
+        for (let i = 0; i < tokens.length; i++) {
+            if (!tokens[i].startsWith('<')) { 
+                let text = tokens[i];
+                
+                keys.forEach((word, index) => {
+                    let escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    let regex = new RegExp(`(^|[^a-zA-ZçğıöşüÇĞİÖŞÜ'])(${escapedWord})(?=[^a-zA-ZçğıöşüÇĞİÖŞÜ']|$)`, 'g');
+                    text = text.replace(regex, `$1###${index}###`);
+                });
+                
+                keys.forEach((word, index) => {
+                    let markerRegex = new RegExp(`###${index}###`, 'g');
+                    text = text.replace(markerRegex, `<span class="dict-word" onclick="toggleTooltip(event, this)">${word}<span class="dict-tooltip">${customDictionary[word]}</span></span>`);
+                });
+                
+                tokens[i] = text;
+            }
+        }
+        return tokens.join('');
+    }
+
+    function toggleTooltip(event, element) {
+        event.stopPropagation(); 
+        document.querySelectorAll('.dict-word').forEach(el => {
+            if(el !== element) el.classList.remove('active');
+        });
+        element.classList.toggle('active');
+    }
+
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.dict-word').forEach(el => el.classList.remove('active'));
+    });
+
+    const lessonCards = [
+        [
+            { turkish: '<span class="base-text">Hemşire kan aldı.</span>', english: '<span class="base-text">The nurse took blood.</span>' },
+            { turkish: '<span class="base-text">Hemşire</span> <span class="step2-text">hızlı bir şekilde</span> <span class="base-text">kan aldı.</span>', english: '<span class="base-text">The nurse took blood</span> <span class="step2-text">in a quick way</span>.' },
+            { turkish: '<span class="base-text">Hemşire</span> <span class="step3-text">koltuğa oturduktan sonra</span> <span class="step2-text">hızlı bir şekilde</span> <span class="base-text">kan aldı.</span>', english: '<span class="base-text">The nurse took blood</span> <span class="step2-text">in a quick way</span> <span class="step3-text">after I sat on the armchair</span>.' }
+        ],
+        [
+            { turkish: '<span class="base-text">Pilot kokpite girdi.</span>', english: '<span class="base-text">The pilot entered the cockpit.</span>' },
+            { turkish: '<span class="base-text">Pilot</span> <span class="step2-text">göstergeleri kontrol etmek için</span> <span class="base-text">kokpite girdi.</span>', english: '<span class="base-text">The pilot entered the cockpit</span> <span class="step2-text">in order to check the gauges</span>.' },
+            { turkish: '<span class="base-text">Pilot</span> <span class="step3-text">değiştirilen</span> <span class="step2-text">göstergeleri kontrol etmek için</span> <span class="base-text">kokpite girdi.</span>', english: '<span class="base-text">The pilot entered the cockpit</span> <span class="step2-text">in order to check the</span> <span class="step3-text">changed</span> <span class="step2-text">gauges</span>.' }
+        ],
+        [
+            { turkish: '<span class="base-text">Polis arabaları durdurdu.</span>', english: '<span class="base-text">The police stopped the cars.</span>' },
+            { turkish: '<span class="base-text">Polis</span> <span class="step2-text">terör saldırısından dolayı</span> <span class="base-text">arabaları durdurdu.</span>', english: '<span class="base-text">The police stopped the cars</span> <span class="step2-text">due to terror attack</span>.' },
+            { turkish: '<span class="step3-text">Görevli</span> <span class="base-text">polis</span> <span class="step2-text">terör saldırısından dolayı</span> <span class="base-text">arabaları durdurdu.</span>', english: '<span class="base-text">The</span> <span class="step3-text">assigned</span> <span class="base-text">police stopped the cars</span> <span class="step2-text">due to terror attack</span>.' }
+        ],
+        [
+            { turkish: '<span class="base-text">Veteriner köpeği ameliyat etmek zorundaydı.</span>', english: '<span class="base-text">The vet had to operate the dog.</span>' },
+            { turkish: '<span class="base-text">Veteriner</span> <span class="step2-text">köpek ölmeden önce</span> <span class="base-text">köpeği ameliyat etmek zorundaydı.</span>', english: '<span class="base-text">The vet had to operate the dog</span> <span class="step2-text">before the dog died</span>.' },
+            { turkish: '<span class="step3-text">Çağrılan</span> <span class="base-text">veteriner</span> <span class="step2-text">köpek ölmeden önce</span> <span class="base-text">köpeği ameliyat etmek zorundaydı.</span>', english: '<span class="base-text">The</span> <span class="step3-text">called</span> <span class="base-text">vet had to operate the dog</span> <span class="step2-text">before the dog died</span>.' }
+        ],
+        [
+            { turkish: '<span class="base-text">Doktor hastayı muayene edebildi.</span>', english: '<span class="base-text">The doctor could examine the patient.</span>' },
+            { turkish: '<span class="base-text">Doktor</span> <span class="step2-text">hasta hastaneye geldiğinde</span> <span class="base-text">hastayı muayene edebildi.</span>', english: '<span class="base-text">The doctor could examine the patient</span> <span class="step2-text">when the patient came to the hospital</span>.' },
+            { turkish: '<span class="base-text">Doktor</span> <span class="step2-text">hasta hastaneye geldiğinde</span> <span class="step3-text">röntgene bakarak</span> <span class="base-text">hastayı muayene edebildi.</span>', english: '<span class="base-text">The doctor could examine the patient</span> <span class="step3-text">by looking at x-ray</span> <span class="step2-text">when the patient came to the hospital</span>.' }
+        ],
+        [
+            { turkish: '<span class="base-text">Gümrük memuru valizimi açmıştı.</span>', english: '<span class="base-text">The Customs officer had opened my luggage.</span>' },
+            { turkish: '<span class="base-text">Gümrük memuru valizimi</span> <span class="step2-text">uygun bir şekilde</span> <span class="base-text">açmıştı.</span>', english: '<span class="base-text">The Customs officer had opened my luggage</span> <span class="step2-text">in a proper way</span>.' },
+            { turkish: '<span class="base-text">Gümrük memuru</span> <span class="step3-text">pasaportumu çıkarırken</span> <span class="base-text">valizimi</span> <span class="step2-text">uygun bir şekilde</span> <span class="base-text">açmıştı.</span>', english: '<span class="base-text">The Customs officer had opened my luggage</span> <span class="step2-text">in a proper way</span> <span class="step3-text">while I was taking out my passport</span>.' }
+        ],
+        [
+            { turkish: '<span class="base-text">Yolcu uçakta bağırmak zorunda değildi.</span>', english: '<span class="base-text">The passenger didn\'t have to shout in the plane.</span>' },
+            { turkish: '<span class="base-text">Yolcu</span> <span class="step2-text">koltuğuna oturduğu için</span> <span class="base-text">uçakta bağırmak zorunda değildi.</span>', english: '<span class="base-text">The passenger didn\'t have to shout in the plane</span> <span class="step2-text">since she sat on her seat</span>.' },
+            { turkish: '<span class="base-text">Yolcu</span> <span class="step2-text">koltuğuna oturduğu için</span> <span class="step3-text">herkesi rahatsız ederek</span> <span class="base-text">uçakta bağırmak zorunda değildi.</span>', english: '<span class="base-text">The passenger didn\'t have to shout in the plane</span> <span class="step3-text">by disturbing everybody</span> <span class="step2-text">since she sat on her seat</span>.' }
+        ],
+        [
+            { turkish: '<span class="base-text">Satıcı ürünleri gösteriyordu.</span>', english: '<span class="base-text">The salesman was showing the items.</span>' },
+            { turkish: '<span class="base-text">Satıcı</span> <span class="step2-text">müşterinin seçebilmesi için</span> <span class="base-text">ürünleri gösteriyordu.</span>', english: '<span class="base-text">The salesman was showing the items</span> <span class="step2-text">so that the customer could choose</span>.' },
+            { turkish: '<span class="base-text">Satıcı</span> <span class="step3-text">müşteri dükkana girdiğinden beri</span> <span class="step2-text">müşterinin seçebilmesi için</span> <span class="base-text">ürünleri gösteriyordu.</span>', english: '<span class="base-text">The salesman was showing the items</span> <span class="step2-text">so that the customer could choose</span> <span class="step3-text">since the customer entered the shop</span>.' }
+        ],
+        [
+            { turkish: '<span class="base-text">Müşteri ürün hakkında şikayet etti.</span>', english: '<span class="base-text">The customer complained about the item.</span>' },
+            { turkish: '<span class="base-text">Müşteri</span> <span class="step2-text">fabrikaya yazarak</span> <span class="base-text">ürün hakkında şikayet etti.</span>', english: '<span class="base-text">The customer complained about the item</span> <span class="step2-text">by writing to the factory</span>.' },
+            { turkish: '<span class="base-text">Müşteri</span> <span class="step3-text">dükkan ürünü kabul etmediği için</span> <span class="step2-text">fabrikaya yazarak</span> <span class="base-text">ürün hakkında şikayet etti.</span>', english: '<span class="base-text">The customer complained about the item</span> <span class="step2-text">by writing to the factory</span> <span class="step3-text">because the shop didn\'t accept the item</span>.' }
+        ],
+        [
+            { turkish: '<span class="base-text">Barmen kokteyl hazırlıyordu.</span>', english: '<span class="base-text">The barman was preparing a cocktail.</span>' },
+            { turkish: '<span class="base-text">Barmen</span> <span class="step2-text">müşteri bara oturana kadar</span> <span class="base-text">kokteyl hazırlıyordu.</span>', english: '<span class="base-text">The barman was preparing a cocktail</span> <span class="step2-text">until the customer sat at the bar</span>.' },
+            { turkish: '<span class="base-text">Barmen</span> <span class="step2-text">müşteri bara oturana kadar</span> <span class="step3-text">oda servisi tarafından sipariş edilen</span> <span class="base-text">kokteyli hazırlıyordu.</span>', english: '<span class="base-text">The barman was preparing a cocktail</span> <span class="step3-text">ordered by the room service</span> <span class="step2-text">until the customer sat at the bar</span>.' }
+        ],
+        [
+            { turkish: '<span class="base-text">Kaptan radarı kontrol etmeliydi.</span>', english: '<span class="base-text">The captain should have checked the radar.</span>' },
+            { turkish: '<span class="base-text">Kaptan</span> <span class="step2-text">dalgalardan kaçmak için</span> <span class="base-text">radarı kontrol etmeliydi.</span>', english: '<span class="base-text">The captain should have checked the radar</span> <span class="step2-text">in order to escape the waves</span>.' },
+            { turkish: '<span class="base-text">Kaptan</span> <span class="step3-text">kötü havadan dolayı</span> <span class="step2-text">dalgalardan kaçmak için</span> <span class="base-text">radarı kontrol etmeliydi.</span>', english: '<span class="base-text">The captain should have checked the radar</span> <span class="step2-text">in order to escape the waves</span> <span class="step3-text">due to the bad weather</span>.' }
+        ],
+        [
+            { turkish: '<span class="base-text">Tamirci modemleri tamir ederdi.</span>', english: '<span class="base-text">The mechanic used to repair the modems.</span>' },
+            { turkish: '<span class="base-text">Tamirci</span> <span class="step2-text">teknik sorunlara rağmen</span> <span class="base-text">modemleri tamir ederdi.</span>', english: '<span class="base-text">The mechanic used to repair the modems</span> <span class="step2-text">despite technical problems</span>.' },
+            { turkish: '<span class="step3-text">Geçen yıl işe alınan</span> <span class="base-text">tamirci</span> <span class="step2-text">teknik sorunlara rağmen</span> <span class="base-text">modemleri tamir ederdi.</span>', english: '<span class="base-text">The mechanic</span> <span class="step3-text">hired last year</span> <span class="base-text">used to repair the modems</span> <span class="step2-text">despite technical problems</span>.' }
+        ],
+        [
+            { turkish: '<span class="base-text">Korsanlar gemileri durduruyordu.</span>', english: '<span class="base-text">The Pirates were stopping the ships.</span>' },
+            { turkish: '<span class="base-text">Korsanlar</span> <span class="step2-text">fidye almak için</span> <span class="base-text">gemileri durduruyordu.</span>', english: '<span class="base-text">The Pirates were stopping the ships</span> <span class="step2-text">in order to get Ransom</span>.' },
+            { turkish: '<span class="base-text">Korsanlar</span> <span class="step3-text">gemiler sahilin yakınından geçtiğinde</span> <span class="step2-text">fidye almak için</span> <span class="base-text">gemileri durduruyordu.</span>', english: '<span class="base-text">The Pirates were stopping the ships</span> <span class="step2-text">in order to get Ransom</span> <span class="step3-text">when the ships passed near the coast</span>.' }
+        ],
+        [
+            { turkish: '<span class="base-text">Bahçıvan çimleri kesmek zorunda kalacak.</span>', english: '<span class="base-text">The gardener will have to cut the grass.</span>' },
+            { turkish: '<span class="base-text">Bahçıvan</span> <span class="step2-text">bahçeyi temizledikten sonra</span> <span class="base-text">çimleri kesmek zorunda kalacak.</span>', english: '<span class="base-text">The gardener will have to cut the grass</span> <span class="step2-text">after he cleans the garden</span>.' },
+            { turkish: '<span class="step3-text">Ev sahibesi</span> <span class="base-text">bahçıvanın</span> <span class="step2-text">bahçeyi temizledikten sonra</span> <span class="base-text">çimleri kesmek zorunda kalacağını</span> <span class="step3-text">hatırlattı.</span>', english: '<span class="step3-text">The land lady reminded that</span> <span class="base-text">the gardener will have to cut the grass</span> <span class="step2-text">after he cleans the garden</span>.' }
+        ],
+        [
+            { turkish: '<span class="base-text">Avukat dosyayı inceleyemedi.</span>', english: '<span class="base-text">The lawyer couldn\'t examine the file.</span>' },
+            { turkish: '<span class="base-text">Avukat</span> <span class="step2-text">müvekkili ofise gelene kadar</span> <span class="base-text">dosyayı inceleyemedi.</span>', english: '<span class="base-text">The lawyer couldn\'t examine the file</span> <span class="step2-text">until his client arrived in the office</span>.' },
+            { turkish: '<span class="base-text">Avukatın</span> <span class="step2-text">müvekkili ofise gelene kadar</span> <span class="base-text">dosyayı</span> <span class="step3-text">neden</span> <span class="base-text">inceleyemediğini</span> <span class="step3-text">öğrendik.</span>', english: '<span class="step3-text">We learned why</span> <span class="base-text">the lawyer couldn\'t examine the file</span> <span class="step2-text">until his client arrived in the office</span>.' }
+        ],
+        [
+            { turkish: '<span class="base-text">Müdür çalışanı uyardı.</span>', english: '<span class="base-text">The manager warned the employee.</span>' },
+            { turkish: '<span class="base-text">Müdür</span> <span class="step2-text">ofiste dedikodu yapan</span> <span class="base-text">çalışanı uyardı.</span>', english: '<span class="base-text">The manager warned the employee</span> <span class="step2-text">gossiping in the office</span>.' },
+            { turkish: '<span class="step3-text">CEO</span> <span class="base-text">müdürün</span> <span class="step2-text">ofiste dedikodu yapan</span> <span class="base-text">çalışanı</span> <span class="step3-text">uyarıp uyarmadığını merak ediyordu.</span>', english: '<span class="step3-text">The CEO was wondering if</span> <span class="base-text">the manager warned the employee</span> <span class="step2-text">gossiping in the office</span>.' }
+        ],
+        [
+            { turkish: '<span class="base-text">Koç planı anlatıyordu.</span>', english: '<span class="base-text">The coach was explaining the plan.</span>' },
+            { turkish: '<span class="base-text">Koç</span> <span class="step2-text">oyuncular yedek kulübesinde otururken iPad kullanarak</span> <span class="base-text">planı anlatıyordu.</span>', english: '<span class="base-text">The coach was explaining the plan</span> <span class="step2-text">by using iPad while the players were sitting on the bench</span>.' }
+        ],
+        [
+            { turkish: '<span class="base-text">Turist araba kiralamalı.</span>', english: '<span class="base-text">The tourist should rent a car.</span>' },
+            { turkish: '<span class="base-text">Turist</span> <span class="step2-text">önemli şehirleri ziyaret edebilmesi için</span> <span class="base-text">araba kiralamalı.</span>', english: '<span class="base-text">The tourist should rent a car</span> <span class="step2-text">so that he could visit important cities</span>.' },
+            { turkish: '<span class="step3-text">Avrupa\'daki seyahatinin tadını çıkaran</span> <span class="base-text">turist</span> <span class="step2-text">önemli şehirleri ziyaret edebilmesi için</span> <span class="base-text">araba kiralamalı.</span>', english: '<span class="base-text">The Tourist</span> <span class="step3-text">enjoying his trip in Europe</span> <span class="base-text">should rent a car</span> <span class="step2-text">so that he could visit important cities</span>.' }
+        ],
+        [
+            { turkish: '<span class="base-text">Güvenlik çantaları kontrol ediyor.</span>', english: '<span class="base-text">The security is checking the bags.</span>' },
+            { turkish: '<span class="base-text">Güvenlik</span> <span class="step2-text">kimse silahla giremesin diye</span> <span class="base-text">çantaları kontrol ediyor.</span>', english: '<span class="base-text">The security is checking the bags</span> <span class="step2-text">so that nobody can enter with a gun</span>.' },
+            { turkish: '<span class="step3-text">Suçlular</span> <span class="base-text">güvenliğin</span> <span class="step2-text">kimse silahla giremesin diye</span> <span class="base-text">çantaları kontrol ettiğini</span> <span class="step3-text">bilmek zorundaydı.</span>', english: '<span class="step3-text">The criminals had to know that</span> <span class="base-text">the security is checking the bags</span> <span class="step2-text">so that nobody can enter with a gun</span>.' }
+        ],
+        [
+            { turkish: '<span class="base-text">Futbolcu üç gol attı.</span>', english: '<span class="base-text">The footballer scored three goals.</span>' },
+            { turkish: '<span class="base-text">Futbolcu</span> <span class="step2-text">ilk yarı bitene kadar</span> <span class="base-text">üç gol attı.</span>', english: '<span class="base-text">The footballer scored three goals</span> <span class="step2-text">until first half finished</span>.' },
+            { turkish: '<span class="step3-text">Arjantin\'den transfer edilen</span> <span class="base-text">futbolcu</span> <span class="step2-text">ilk yarı bitene kadar</span> <span class="base-text">üç gol attı.</span>', english: '<span class="base-text">The footballer</span> <span class="step3-text">transferred from Argentina</span> <span class="base-text">scored three goals</span> <span class="step2-text">until first half finished</span>.' }
+        ],
+        [
+            { turkish: '<span class="base-text">Şarkıcı Eurovision\'u kazanacak.</span>', english: '<span class="base-text">The singer will win the Eurovision.</span>' },
+            { turkish: '<span class="step2-text">Rock müzik besteleyen</span> <span class="base-text">şarkıcı Eurovision\'u kazanacak.</span>', english: '<span class="base-text">The singer</span> <span class="step2-text">composing rock music</span> <span class="base-text">will win the Eurovision</span>.' },
+            { turkish: '<span class="step3-text">Kimse</span> <span class="step2-text">rock müzik besteleyen</span> <span class="base-text">şarkıcının Eurovision\'u kazanacağına</span> <span class="step3-text">inanmadı.</span>', english: '<span class="step3-text">Nobody believed that</span> <span class="base-text">the singer</span> <span class="step2-text">composing rock music</span> <span class="base-text">will win the Eurovision</span>.' }
+        ],
+        [
+            { turkish: '<span class="base-text">Politikacılar doğruyu söylemek zorunda değil.</span>', english: '<span class="base-text">The politicians don\'t have to tell the truth.</span>' },
+            { turkish: '<span class="step2-text">Devletten para çalan</span> <span class="base-text">politikacılar doğruyu söylemek zorunda değil.</span>', english: '<span class="base-text">The politicians</span> <span class="step2-text">stealing money from the state</span> <span class="base-text">don\'t have to tell the truth.</span>' },
+            { turkish: '<span class="step3-text">Hepimiz biliyoruz ki</span> <span class="step2-text">devletten para çalan</span> <span class="base-text">politikacılar doğruyu söylemek zorunda değil.</span>', english: '<span class="step3-text">We all know that</span> <span class="base-text">the politicians</span> <span class="step2-text">stealing money from the state</span> <span class="base-text">don\'t have to tell the truth.</span>' }
+        ],
+        [
+            { turkish: '<span class="base-text">Barmen viski dolduruyordu.</span>', english: '<span class="base-text">The barman was pouring whiskey.</span>' },
+            { turkish: '<span class="base-text">Barmen</span> <span class="step2-text">müşterinin problemlerini unutabilmesi için</span> <span class="base-text">viski dolduruyordu.</span>', english: '<span class="base-text">The barman was pouring whiskey</span> <span class="step2-text">so that the customer could forget his problems</span>.' },
+            { turkish: '<span class="base-text">Barmen</span> <span class="step3-text">sarhoş olana kadar</span> <span class="step2-text">müşterinin problemlerini unutabilmesi için</span> <span class="base-text">viski dolduruyordu.</span>', english: '<span class="base-text">The barman was pouring whiskey</span> <span class="step2-text">so that the customer could forget his problems</span> <span class="step3-text">until he got drunk</span>.' }
+        ],
+        [
+            { turkish: '<span class="base-text">Kasap tavuğu doğramadı.</span>', english: '<span class="base-text">The butcher didn\'t chop the chicken.</span>' },
+            { turkish: '<span class="base-text">Kasap tavuğu</span> <span class="step2-text">kaba bir şekilde</span> <span class="base-text">doğramadı.</span>', english: '<span class="base-text">The butcher didn\'t chop the chicken</span> <span class="step2-text">in a rude way</span>.' },
+            { turkish: '<span class="step3-text">Diğer müşterilere hizmet eden</span> <span class="base-text">kasap tavuğu</span> <span class="step2-text">kaba bir şekilde</span> <span class="base-text">doğramadı.</span>', english: '<span class="base-text">The</span> <span class="step3-text">butcher serving other customers</span> <span class="base-text">didn\'t chop the chicken</span> <span class="step2-text">in a rude way</span>.' }
+        ]
+    ];
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    shuffleArray(lessonCards);
+
+    let currentCardIndex = 0; 
+    let currentStepIndex = 0; 
+    let isEnglishRevealed = false;
+
+    const turkishOutput = document.getElementById('turkish-output');
+    const englishOutput = document.getElementById('english-output');
+    const languageSeparator = document.getElementById('language-separator');
+    const stepCounter = document.getElementById('step-counter');
+    const globalCounter = document.getElementById('global-counter');
+
+    function updateDisplay() {
+        const currentCard = lessonCards[currentCardIndex];
+        const currentStep = currentCard[currentStepIndex];
+
+        turkishOutput.innerHTML = injectDictionary(currentStep.turkish);
+        englishOutput.innerHTML = injectDictionary(currentStep.english);
+        
+        stepCounter.innerText = `Step ${currentStepIndex + 1} / ${currentCard.length}`;
+        globalCounter.innerText = `Card ${currentCardIndex + 1} / ${lessonCards.length}`;
+
+        if (isEnglishRevealed) {
+            englishOutput.classList.add('revealed');
+            languageSeparator.classList.add('revealed');
+        } else {
+            englishOutput.classList.remove('revealed');
+            languageSeparator.classList.remove('revealed');
+        }
+    }
+
+    updateDisplay();
+
+    document.addEventListener('keydown', function(event) {
+        const currentCard = lessonCards[currentCardIndex];
+
+        if (event.key === 'ArrowUp') {
+            event.preventDefault();
+            if (!isEnglishRevealed) {
+                isEnglishRevealed = true;
+                updateDisplay();
+            }
+        } 
+        else if (event.key === 'ArrowRight') {
+            event.preventDefault();
+            if (currentStepIndex < currentCard.length - 1) {
+                currentStepIndex++;
+                isEnglishRevealed = false; 
+                updateDisplay();
+            }
+        } 
+        else if (event.key === 'ArrowLeft') {
+            event.preventDefault();
+            if (isEnglishRevealed) {
+                isEnglishRevealed = false;
+                updateDisplay();
+            } else if (currentStepIndex > 0) {
+                currentStepIndex--;
+                isEnglishRevealed = false; 
+                updateDisplay();
+            }
+        }
+        else if (event.key === 'ArrowDown') {
+            event.preventDefault();
+            if (currentCardIndex < lessonCards.length - 1) {
+                currentCardIndex++;
+                currentStepIndex = 0; 
+                isEnglishRevealed = false; 
+                updateDisplay();
+            }
+        }
+    });
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('SW registered.', reg))
+                .catch(err => console.log('SW failed:', err));
+        });
+    }
+</script>
+
+</body>
+</html>
