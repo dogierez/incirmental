@@ -233,6 +233,7 @@
 </head>
 <body>
 
+<!-- Top Application Logo -->
 <img src="icon-192x192.png" alt="App Logo" class="top-app-logo">
 
 <svg class="bg-clipart icon-cap" viewBox="0 0 100 100">
@@ -328,7 +329,8 @@
         "Şarkıcı": "singer", "şarkıcı": "singer", "şarkıcının": "singer", "kazanacak": "win", "kazanacağına": "win", "Eurovision'u": "Eurovision", "Rock müzik": "rock music", "rock müzik": "rock music", "besteleyen": "compose", "Kimse": "nobody", "kimse": "nobody", "inanmadı": "believe",
         "Politikacılar": "politician", "politikacılar": "politician", "doğruyu": "truth", "söylemek": "tell", "devletten": "state", "para": "money", "çalan": "steal", "Hepimiz": "all of us", "biliyoruz": "know",
         "viski": "whiskey", "dolduruyordu": "pour", "unutabilmesi": "forget", "sarhoş": "drunk", "olana": "become",
-        "Kasap": "butcher", "kasap": "butcher", "tavuğu": "chicken", "doğramadı": "chop", "kaba": "rude", "Diğer": "other", "diğer": "other", "hizmet eden": "serve", "müşterilere": "customer"
+        "Kasap": "butcher", "kasap": "butcher", "tavuğu": "chicken", "doğramadı": "chop", "kaba": "rude", "Diğer": "other", "diğer": "other", "hizmet eden": "serve", "müşterilere": "customer",
+        "oturduğundan": "sit", "unutsun": "forget", "diye": "so that"
     };
 
     function injectDictionary(htmlString) {
@@ -399,10 +401,11 @@
             { turkish: '<span class="base-text">Gümrük memuru valizimi</span> <span class="step2-text">uygun bir şekilde</span> <span class="base-text">açmıştı.</span>', english: '<span class="base-text">The Customs officer had opened my luggage</span> <span class="step2-text">in a proper way</span>.' },
             { turkish: '<span class="base-text">Gümrük memuru</span> <span class="step3-text">pasaportumu çıkarırken</span> <span class="base-text">valizimi</span> <span class="step2-text">uygun bir şekilde</span> <span class="base-text">açmıştı.</span>', english: '<span class="base-text">The Customs officer had opened my luggage</span> <span class="step2-text">in a proper way</span> <span class="step3-text">while I was taking out my passport</span>.' }
         ],
+        // CARD 7: The Passenger
         [
             { turkish: '<span class="base-text">Yolcu uçakta bağırmak zorunda değildi.</span>', english: '<span class="base-text">The passenger didn\'t have to shout in the plane.</span>' },
-            { turkish: '<span class="base-text">Yolcu</span> <span class="step2-text">koltuğuna oturduğu için</span> <span class="base-text">uçakta bağırmak zorunda değildi.</span>', english: '<span class="base-text">The passenger didn\'t have to shout in the plane</span> <span class="step2-text">since she sat on her seat</span>.' },
-            { turkish: '<span class="base-text">Yolcu</span> <span class="step2-text">koltuğuna oturduğu için</span> <span class="step3-text">herkesi rahatsız ederek</span> <span class="base-text">uçakta bağırmak zorunda değildi.</span>', english: '<span class="base-text">The passenger didn\'t have to shout in the plane</span> <span class="step3-text">by disturbing everybody</span> <span class="step2-text">since she sat on her seat</span>.' }
+            { turkish: '<span class="base-text">Yolcu</span> <span class="step2-text">koltuğuna oturduğundan beri</span> <span class="base-text">uçakta bağırmak zorunda değildi.</span>', english: '<span class="base-text">The passenger didn\'t have to shout in the plane</span> <span class="step2-text">since she sat on her seat</span>.' },
+            { turkish: '<span class="base-text">Yolcu</span> <span class="step2-text">koltuğuna oturduğundan beri</span> <span class="step3-text">herkesi rahatsız ederek</span> <span class="base-text">uçakta bağırmak zorunda değildi.</span>', english: '<span class="base-text">The passenger didn\'t have to shout in the plane</span> <span class="step3-text">by disturbing everybody</span> <span class="step2-text">since she sat on her seat</span>.' }
         ],
         [
             { turkish: '<span class="base-text">Satıcı ürünleri gösteriyordu.</span>', english: '<span class="base-text">The salesman was showing the items.</span>' },
@@ -449,9 +452,11 @@
             { turkish: '<span class="base-text">Müdür</span> <span class="step2-text">ofiste dedikodu yapan</span> <span class="base-text">çalışanı uyardı.</span>', english: '<span class="base-text">The manager warned the employee</span> <span class="step2-text">gossiping in the office</span>.' },
             { turkish: '<span class="step3-text">CEO</span> <span class="base-text">müdürün</span> <span class="step2-text">ofiste dedikodu yapan</span> <span class="base-text">çalışanı</span> <span class="step3-text">uyarıp uyarmadığını merak ediyordu.</span>', english: '<span class="step3-text">The CEO was wondering if</span> <span class="base-text">the manager warned the employee</span> <span class="step2-text">gossiping in the office</span>.' }
         ],
+        // CARD 17: The Coach (Fixed to 3 Steps)
         [
             { turkish: '<span class="base-text">Koç planı anlatıyordu.</span>', english: '<span class="base-text">The coach was explaining the plan.</span>' },
-            { turkish: '<span class="base-text">Koç</span> <span class="step2-text">oyuncular yedek kulübesinde otururken iPad kullanarak</span> <span class="base-text">planı anlatıyordu.</span>', english: '<span class="base-text">The coach was explaining the plan</span> <span class="step2-text">by using iPad while the players were sitting on the bench</span>.' }
+            { turkish: '<span class="base-text">Koç</span> <span class="step2-text">iPad kullanarak</span> <span class="base-text">planı anlatıyordu.</span>', english: '<span class="base-text">The coach was explaining the plan</span> <span class="step2-text">by using iPad</span>.' },
+            { turkish: '<span class="base-text">Koç</span> <span class="step3-text">oyuncular yedek kulübesinde otururken</span> <span class="step2-text">iPad kullanarak</span> <span class="base-text">planı anlatıyordu.</span>', english: '<span class="base-text">The coach was explaining the plan</span> <span class="step2-text">by using iPad</span> <span class="step3-text">while the players were sitting on the bench</span>.' }
         ],
         [
             { turkish: '<span class="base-text">Turist araba kiralamalı.</span>', english: '<span class="base-text">The tourist should rent a car.</span>' },
@@ -473,20 +478,23 @@
             { turkish: '<span class="step2-text">Rock müzik besteleyen</span> <span class="base-text">şarkıcı Eurovision\'u kazanacak.</span>', english: '<span class="base-text">The singer</span> <span class="step2-text">composing rock music</span> <span class="base-text">will win the Eurovision</span>.' },
             { turkish: '<span class="step3-text">Kimse</span> <span class="step2-text">rock müzik besteleyen</span> <span class="base-text">şarkıcının Eurovision\'u kazanacağına</span> <span class="step3-text">inanmadı.</span>', english: '<span class="step3-text">Nobody believed that</span> <span class="base-text">the singer</span> <span class="step2-text">composing rock music</span> <span class="base-text">will win the Eurovision</span>.' }
         ],
+        // CARD 22: The Politicians
         [
             { turkish: '<span class="base-text">Politikacılar doğruyu söylemek zorunda değil.</span>', english: '<span class="base-text">The politicians don\'t have to tell the truth.</span>' },
             { turkish: '<span class="step2-text">Devletten para çalan</span> <span class="base-text">politikacılar doğruyu söylemek zorunda değil.</span>', english: '<span class="base-text">The politicians</span> <span class="step2-text">stealing money from the state</span> <span class="base-text">don\'t have to tell the truth.</span>' },
             { turkish: '<span class="step3-text">Hepimiz biliyoruz ki</span> <span class="step2-text">devletten para çalan</span> <span class="base-text">politikacılar doğruyu söylemek zorunda değil.</span>', english: '<span class="step3-text">We all know that</span> <span class="base-text">the politicians</span> <span class="step2-text">stealing money from the state</span> <span class="base-text">don\'t have to tell the truth.</span>' }
         ],
+        // CARD 23: The Barman (Corrected Turkish phrasing)
         [
             { turkish: '<span class="base-text">Barmen viski dolduruyordu.</span>', english: '<span class="base-text">The barman was pouring whiskey.</span>' },
-            { turkish: '<span class="base-text">Barmen</span> <span class="step2-text">müşterinin problemlerini unutabilmesi için</span> <span class="base-text">viski dolduruyordu.</span>', english: '<span class="base-text">The barman was pouring whiskey</span> <span class="step2-text">so that the customer could forget his problems</span>.' },
-            { turkish: '<span class="base-text">Barmen</span> <span class="step3-text">sarhoş olana kadar</span> <span class="step2-text">müşterinin problemlerini unutabilmesi için</span> <span class="base-text">viski dolduruyordu.</span>', english: '<span class="base-text">The barman was pouring whiskey</span> <span class="step2-text">so that the customer could forget his problems</span> <span class="step3-text">until he got drunk</span>.' }
+            { turkish: '<span class="base-text">Barmen</span> <span class="step2-text">müşteri problemlerini unutsun diye</span> <span class="base-text">viski dolduruyordu.</span>', english: '<span class="base-text">The barman was pouring whiskey</span> <span class="step2-text">so that the customer could forget his problems</span>.' },
+            { turkish: '<span class="base-text">Barmen</span> <span class="step3-text">sarhoş olana kadar</span> <span class="step2-text">müşteri problemlerini unutsun diye</span> <span class="base-text">viski dolduruyordu.</span>', english: '<span class="base-text">The barman was pouring whiskey</span> <span class="step2-text">so that the customer could forget his problems</span> <span class="step3-text">until he got drunk</span>.' }
         ],
+        // CARD 24: The Butcher (Corrected Butcher separation)
         [
             { turkish: '<span class="base-text">Kasap tavuğu doğramadı.</span>', english: '<span class="base-text">The butcher didn\'t chop the chicken.</span>' },
             { turkish: '<span class="base-text">Kasap tavuğu</span> <span class="step2-text">kaba bir şekilde</span> <span class="base-text">doğramadı.</span>', english: '<span class="base-text">The butcher didn\'t chop the chicken</span> <span class="step2-text">in a rude way</span>.' },
-            { turkish: '<span class="step3-text">Diğer müşterilere hizmet eden</span> <span class="base-text">kasap tavuğu</span> <span class="step2-text">kaba bir şekilde</span> <span class="base-text">doğramadı.</span>', english: '<span class="base-text">The</span> <span class="step3-text">butcher serving other customers</span> <span class="base-text">didn\'t chop the chicken</span> <span class="step2-text">in a rude way</span>.' }
+            { turkish: '<span class="step3-text">Diğer müşterilere hizmet eden</span> <span class="base-text">kasap tavuğu</span> <span class="step2-text">kaba bir şekilde</span> <span class="base-text">doğramadı.</span>', english: '<span class="base-text">The butcher</span> <span class="step3-text">serving other customers</span> <span class="base-text">didn\'t chop the chicken</span> <span class="step2-text">in a rude way</span>.' }
         ]
     ];
 
@@ -550,6 +558,7 @@
         } 
         else if (event.key === 'ArrowLeft') {
             event.preventDefault();
+            
             if (isEnglishRevealed) {
                 isEnglishRevealed = false;
                 updateDisplay();
