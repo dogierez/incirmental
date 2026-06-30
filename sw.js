@@ -1,4 +1,4 @@
-const CACHE_NAME = 'incirmental-app-v1';
+const CACHE_NAME = 'incirmental-app-v2';
 const urlsToCache = [
   './',
   './index.html',
@@ -27,5 +27,20 @@ self.addEventListener('fetch', event => {
         return fetch(event.request);
       }
     )
+  );
+});
+
+// Activate event to clear out the old v1 cache so the new sentences show up
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
   );
 });
